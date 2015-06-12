@@ -1,0 +1,381 @@
+Introduction to Go and Concurrency
+4 June 2015
+
+Brendan Tracey
+
+* Talk Outline
+- Why Go
+- Introduction to programming in Go
+- Concurrent examples
+
+* The Sell
+
+* Scientific Computing Circa 2008
+
+.image intro_concurrency/programming_2008.jpg _ 600
+
+Choice between easy for humans or fast for computers
+
+* Scientific Computing 2015
+
+.image intro_concurrency/programming_2015.jpg _ 600
+
+Go is the knee of the curve
+
+* What is Go?
+
+* What is Go?
+	"Go is an attempt to combine the ease of programming of an 
+	interpreted, dynamically typed language with the efficiency and 
+	safety of a statically typed, compiled language. It also aims to be 
+	modern, with support for networked and multicore computing." http://golang.org/doc/faq
+
+- Compiled
+- Open-Source
+- Statically-Typed
+- Garbage collected
+- Concurrent
+- My language of choice
+
+* Origins
+Designed at Google by 
+
+- Ken Thompson (C, Unix, UTF-8)
+- Rob Pike (UTF-8, Squeak, NewSqueak, Plan9, Inferno) 
+- Robert Griesemer (Cray Vectorization, Sawzall, Java HotSpot) 
+
+Fully open-source effort 
+
+- [[http://github.com/golang][github.com/golang]]
+- Highly talented lead development team
+- Roughly 600 Project Contributors
+- [[https://groups.google.com/forum/#!forum/golang-nuts][User forum]]
+- [[https://groups.google.com/forum/#!forum/golang-dev][Developer forum]]
+- [[https://groups.google.com/forum/#!forum/golang-codereviews][Code review monitor]]
+
+* Why Go:
+Go is simple:
+
+- Go spec: 50 Pages
+- C++ spec: 1200 Pages
+- Python spec: n/a
+
+Compact set of orthogonal language features
+
+* Why Go:
+Go is scalable:
+
+- [[http://talks.golang.org/2012/splash.article][Language Design in the Service of Software Engineering]]
+- Built for large programs and large teams
+- Composition (types, functions, packages)
+
+* Why Go
+Go is fast:
+
+- Goal within 10% of C
+- Short compile times
+- Easy parallel computing (more later)
+
+* Why Go:
+Go is easy (language design):
+
+- Simple syntax (discussed later)
+- Garbage collected (no automatic memory management)
+- Stack traces on nil dereference (not "segmentation fault")
+- Pointers but automatically on stack wherever possible
+- Composition of types, not inheritance
+- Consistent design - legible code
+- Large standard library
+
+* Why Go
+Go is easy (tools):
+
+- Dowloading packages (go get)
+- No makefiles (go install)
+- Testing suite (go test)
+- Race/Deadlock detection (go install -race)
+- Automatic documentation (godoc)
+- Code formatting (gofmt)
+- Automatic import detection (goimports)
+- Profiling (go tool pprof)
+
+* Why Go
+Better than any other language for (personal opinion):
+
+- Effortlessly using external libraries
+- Managing Complexity
+- Writing legible performant code
+- Writing code that will last
+
+Individual steps may require more work, but stays managable as the program grows
+
+* Numeric programming
+[[github.com/gonum][Gonum]] project building a core of numeric functions
+
+- BLAS implementation (both native Go and C bindings)
+- Good matrix library (and constantly getting better)
+- Stats, finite difference, graphs etc.
+- Unconstrained local optimization (constrained and global under development)
+
+Not as fully-featured as scipy, but a new consistent design all in pure Go
+
+* Whirlwind tour of go
+
+* Hello, world!
+.play intro_concurrency/helloworld.go
+
+Run with:
+
+  go run helloworld.go
+
+Compile:
+  
+  go build helloworld.go
+
+Compile and place on $PATH:
+
+  go install helloworld.go
+
+* Variable and Function Declarations
+.play intro_concurrency/basics.go
+
+* Type and Method declarations, Struct Literals
+.play intro_concurrency/firststruct.go /Uniform/,$
+
+* Slices and range
+.play intro_concurrency/slices.go /init/,$
+
+* External packages
+.play intro_concurrency/extpack.go
+
+Download the external package:
+
+   go get github.com/gonum/optimize/functions
+
+* Putting them all together: Monte Carlo
+.play intro_concurrency/mc.go /func main/,$
+
+* Interfaces
+An *interface* is a set of methods
+
+  type Distribution interface {
+      Rand() float64
+  }
+
+A type *satisfies* the inteface if it has those methods
+
+  type Uniform struct{
+      Min float64
+      Max float64
+  }
+
+  func (u Uniform) Rand() float64 {
+      return rand.Float64()*(u.Max - u.Min) + u.Min
+  }
+
+Uniform satisfies the interface _implicitly_
+
+* Monte Carlo with interfaces
+.play intro_concurrency/interface.go /MonteCarlo estimates/,$
+
+* Concurrency
+
+* Concurrency
+
+MPI:
+
+- One source code, but multiple instances running
+- One thread per instance (frequently)
+- Distributed memory (even in a shared-memory environment)
+- Programmer explicitly describes what happens when
+
+* Concurrency
+Go:
+
+- One source code
+- One program instance
+- Shared memory
+- Programmer describes what may happen at the same time
+- Go runtime decides how it happens
+- [[https://www.youtube.com/watch?v=cN_DpYBzKso][Concurrency is not parallelism]]
+- Does not prohibit MPI for distributed memory computation
+
+* Concurrency
+Three major parts 
+
+- Goroutines (`go` keyword) describe independently executing units
+- Channels (`chan` type) communicate between goroutines
+- Select statement chooses between channels
+
+`sync` package provides synchronization primitives (`sync.Mutex`, `sync.WaitGroup`)
+
+* Goroutines
+The `go` command launches a concurrently executing process
+
+  go func()
+  go func(x, y, ...)
+
+Like a thread, but very cheap
+
+- Goroutines execute independently from one another
+- Millions of goroutines common in some domains
+
+Automatically scheduled onto OS threads by the Go runtime
+
+Enable parallelism with
+
+  runtime.GOMAXPROCS(n)
+  runtime.GOMAXPROCS(runtime.NumCPU())  // Will be automatic in Go 1.5
+
+* Multiple goroutine example
+.play intro_concurrency/goroutines_exit.go /func main/,$
+
+Program ends when main returns
+
+* Example -- WaitGroup
+.play intro_concurrency/goroutines.go /func main/,$
+
+* Parallel Monte Carlo
+.play intro_concurrency/parmc.go /func Par/,$
+
+* Channels
+Channels communicate between two goroutines
+
+Write to a channel
+
+   c <- v // Goroutine blocks until can write
+
+Read from a channel
+
+   v := <-c // Goroutine blocks until can read
+
+Unbuffered (like a synchronous send/receive)
+
+  make(chan float64)
+
+Buffered (like an asynchronous send/receive)
+
+  make(chan float64, 10)
+
+* Channel communication
+.play intro_concurrency/chan.go /func main/,$
+
+Notice that the order is the same
+
+* Channels
+Can have multiple producers and consumers
+
+.play intro_concurrency/multichan.go /func main/,$
+
+* Range
+The `range` keyword reads from the channel until it is closed
+
+.play intro_concurrency/chan_range.go /func consumer/,$
+
+* Deadlock Detection
+
+.play intro_concurrency/deadlock.go
+
+Not perfect, but no false positives
+
+* Race Detection
+  
+.play intro_concurrency/raceexample.go /func main/,$
+
+(Holding down the shift key and press run)
+
+Not perfect, but no false positives
+
+* Select
+The `select` keyword is a switch statement between channel operations
+
+    select {
+    case v := <- c1:
+    	// Do something
+    case <- c2:
+        // Do something else
+    default:
+        // No action available, do a default action
+    }
+
+If no `default`, goroutine blocks until one of the operations is available
+
+* Select Example - Add values received on channel
+.play intro_concurrency/select.go /func worker/,$
+
+* Adaptive Monte Carlo
+Problem: Find the expected value of a function using Monte Carlo
+
+Catch: Error within a user-specified specified tolerance, *not* specified number of samples
+
+- Keep generating samples until the tolerance is met
+
+Concurrently, of course!
+
+Basic strategy
+- *Worker* goroutines that evaluate function and send results on a channel
+- Collect the results until the tolerance is met
+- Close the channel to stop the workers
+
+* Adaptive Monte Carlo -- Generator
+To make our lives easier, let's define some types
+
+.code intro_concurrency/adaptmc.go /START GENERATOR/,/END GENERATOR/
+
+* Adaptive Monte Carlo -- Worker
+
+.code intro_concurrency/adaptmc.go /START_WORKER/,/END_WORKER/
+
+Each worker generates `sz` samples at a time.
+
+Sends data until receives a signal from `quit`.
+
+* Adaptive Monte Carlo -- Function 
+.code intro_concurrency/adaptmc.go /START EXPECTED/,/END EXPECTED/
+
+* Adaptive Monte Carlo -- Main
+.play intro_concurrency/adaptmc.go /func main/,$
+
+* Distributed memory computation
+No official HPC solution
+
+MPI is the wrong paradigm in many cases (global optimization)
+
+Write a server instead
+
+- Go's originally designed for Google's servers
+
+DEMO (server.go, server_writer.go)
+
+* Distributed memory computation
+But MPI is nice too
+
+MPI-like implementation in Go ([[github.com/btracey/mpi]])
+
+- Experimental
+- Not yet as fast or robust as traditional MPI libraries (uses TCP for communication, some bugs)
+- No special compiler, very simple API 
+    mpi.Send(data interface{}, rank, tag int)
+    mpi.Receive(data interface{}, rank, tag int)
+- Trivial to incorporate shared memory (one process per node instead of per CPU)
+- Implementation about 600 lines of code
+
+DEMO (github.com/btracey/mpi/examples/helloworld)
+
+* More information
+Reference Material
+
+- [[golang.org]]
+- [[github.com/gonum]]
+- [[https://tour.golang.org/][Language tour]]
+- [[https://golang.org/ref/spec][Specification]]
+- [[https://golang.org/doc/faq][FAQ]]
+- [[https://golang.org/doc/effective_go.html][Effective Go]]
+
+Talks:
+
+- [[https://talks.golang.org/2012/zen.slide#1][Go and the Zen of Python]]
+- [[https://talks.golang.org/2013/go4python.slide#4][Go for Pythonistas]]
+- [[https://talks.golang.org/2012/concurrency.slide#1][Go Concurrency Patterns]]
+- [[http://talks.golang.org/2015/go4cpp.slide#1][Go for C++ developers]]
+
