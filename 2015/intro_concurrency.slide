@@ -162,7 +162,7 @@ An *interface* is a set of methods
       Rand() float64
   }
 
-A type *satisfies* the inteface if it has those methods
+A type *satisfies* the interface if it has those methods
 
   type Uniform struct{
       Min float64
@@ -282,7 +282,7 @@ Not perfect, but no false positives
   
 .play intro_concurrency/raceexample.go /func main/,$
 
-(Holding down the shift key and press run)
+(Hold down the shift key and press run)
 
 Not perfect, but no false positives
 
