@@ -82,7 +82,7 @@ Go is easy (language design):
 - Simple syntax (discussed later)
 - Garbage collected (no manual memory management)
 - Stack traces on nil dereference (not "segmentation fault")
-- Pointers but automatically on stack wherever possible
+- Pointers put automatically on stack wherever possible
 - Composition of types, not inheritance
 - Consistent design - legible code
 - Large standard library
