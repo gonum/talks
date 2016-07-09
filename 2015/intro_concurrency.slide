@@ -25,9 +25,9 @@ Go is the knee of the curve
 * What is Go?
 
 * What is Go?
-	"Go is an attempt to combine the ease of programming of an 
-	interpreted, dynamically typed language with the efficiency and 
-	safety of a statically typed, compiled language. It also aims to be 
+	"Go is an attempt to combine the ease of programming of an
+	interpreted, dynamically typed language with the efficiency and
+	safety of a statically typed, compiled language. It also aims to be
 	modern, with support for networked and multicore computing." http://golang.org/doc/faq
 
 - Compiled
@@ -38,13 +38,13 @@ Go is the knee of the curve
 - My language of choice
 
 * Origins
-Designed at Google by 
+Designed at Google by
 
 - Ken Thompson (C, Unix, UTF-8)
-- Rob Pike (UTF-8, Squeak, NewSqueak, Plan9, Inferno) 
-- Robert Griesemer (Cray Vectorization, Sawzall, Java HotSpot) 
+- Rob Pike (UTF-8, Squeak, NewSqueak, Plan9, Inferno)
+- Robert Griesemer (Cray Vectorization, Sawzall, Java HotSpot)
 
-Fully open-source effort 
+Fully open-source effort
 
 - [[http://github.com/golang][github.com/golang]]
 - Highly talented lead development team
@@ -129,7 +129,7 @@ Run with:
   go run helloworld.go
 
 Compile:
-  
+
   go build helloworld.go
 
 Compile and place on $PATH:
@@ -201,7 +201,7 @@ Go:
 - Does not prohibit MPI for distributed memory computation
 
 * Concurrency
-Three major parts 
+Three major parts
 
 - Goroutines (`go` keyword) describe independently executing units
 - Channels (`chan` type) communicate between goroutines
@@ -279,7 +279,7 @@ The `range` keyword reads from the channel until it is closed
 Not perfect, but no false positives
 
 * Race Detection
-  
+
 .play intro_concurrency/raceexample.go /func main/,$
 
 (Hold down the shift key and press run)
@@ -330,7 +330,7 @@ Each worker generates `sz` samples at a time.
 
 Sends data until receives a signal from `quit`.
 
-* Adaptive Monte Carlo -- Function 
+* Adaptive Monte Carlo -- Function
 .code intro_concurrency/adaptmc.go /START EXPECTED/,/END EXPECTED/
 
 * Adaptive Monte Carlo -- Main
@@ -354,7 +354,7 @@ MPI-like implementation in Go ([[github.com/btracey/mpi]])
 
 - Experimental
 - Not yet as fast or robust as traditional MPI libraries (uses TCP for communication, some bugs)
-- No special compiler, very simple API 
+- No special compiler, very simple API
     mpi.Send(data interface{}, rank, tag int)
     mpi.Receive(data interface{}, rank, tag int)
 - Trivial to incorporate shared memory (one process per node instead of per CPU)
