@@ -28,7 +28,7 @@ Go is the knee of the curve
 	"Go is an attempt to combine the ease of programming of an
 	interpreted, dynamically typed language with the efficiency and
 	safety of a statically typed, compiled language. It also aims to be
-	modern, with support for networked and multicore computing." http://golang.org/doc/faq
+	modern, with support for networked and multicore computing." https://golang.org/doc/faq
 
 - Compiled
 - Open-Source
@@ -46,7 +46,7 @@ Designed at Google by
 
 Fully open-source effort
 
-- [[http://github.com/golang][github.com/golang]]
+- [[https://github.com/golang][github.com/golang]]
 - Highly talented lead development team
 - Roughly 600 Project Contributors
 - [[https://groups.google.com/forum/#!forum/golang-nuts][User forum]]
@@ -65,7 +65,7 @@ Compact set of orthogonal language features
 * Why Go:
 Go is scalable:
 
-- [[http://talks.golang.org/2012/splash.article][Language Design in the Service of Software Engineering]]
+- [[https://talks.golang.org/2012/splash.article][Language Design in the Service of Software Engineering]]
 - Built for large programs and large teams
 - Composition (types, functions, packages)
 
@@ -365,7 +365,7 @@ DEMO (github.com/btracey/mpi/examples/helloworld)
 * More information
 Reference Material
 
-- [[http://golang.org][golang.org]]
+- [[https://golang.org][golang.org]]
 - [[https://github.com/gonum][github.com/gonum]]
 - [[https://tour.golang.org/][Language tour]]
 - [[https://golang.org/ref/spec][Specification]]
@@ -377,5 +377,5 @@ Talks:
 - [[https://talks.golang.org/2012/zen.slide#1][Go and the Zen of Python]]
 - [[https://talks.golang.org/2013/go4python.slide#4][Go for Pythonistas]]
 - [[https://talks.golang.org/2012/concurrency.slide#1][Go Concurrency Patterns]]
-- [[http://talks.golang.org/2015/go4cpp.slide#1][Go for C++ developers]]
+- [[https://talks.golang.org/2015/go4cpp.slide#1][Go for C++ developers]]
 
