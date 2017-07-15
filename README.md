@@ -1,5 +1,9 @@
 This is a repository for talks given by Gonum developers about Go and Gonum. 
 
+## 2017
+
+- [Introduction to Gonum](http://talks.godoc.org/github.com/gonum/talks/2017/gonumtour.slide)
+
 ## 2015
 
 - [Introduction to Go and Concurrency](http://talks.godoc.org/github.com/gonum/talks/2015/intro_concurrency.slide)

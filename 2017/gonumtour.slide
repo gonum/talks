@@ -1,0 +1,303 @@
+An Introduction to Gonum
+15 July 2017
+
+Brendan Tracey
+
+* Talk Outline
+- Overview of Gonum 
+- Gonum Philosophy
+- Brief examples of packages
+- Call for help
+
+* Overview of Gonum
+
+* What
+- Set of libraries for scientific and numeric programming (think: Numpy / Scipy)
+- Our packages (July 2017):
+
+.image gonumtour/packages.png 450 _
+
+* Where
+[[https://gonum.org][gonum.org]]
+- New [[https://gohugo.io/][Hugo]]-based site coming soon!
+
+	go get -u -t gonum.org/v1/gonum
+
+* Who
+To date: 35 Contributors
+
+Main contributors in New Mexico USA, Adelaide Australia, Karlsruhe Germany, Clermont-Ferrand France...
+
+That is, we have self-assembled. Come join us!
+
+- [[https://github.com/gonum][github.com/gonum]]
+- [[https://github.com/gonum/gonum/blob/master/CONTRIBUTING.md][Contributing guide]]
+- [[https://groups.google.com/forum/#!forum/gonum-dev][Mailing list]]
+
+* Goals of Gonum
+
+* Challenge: The Two Language Problem
+- Code that runs fast (C, C++, Fortran)
+- Code that is easy to write (Matlab, R, Python)
+- Original Matlab code snippet from a project
+
+	for jj = 1:numCities
+		B = zeros(numCities,numAircraft); % optimal cost used to fly to that city using airplane kk
+		for kk = 1:numAircraft
+			B(:,kk) = A(ii-1,:)+(edgeCosts(:,jj,kk))';
+		end
+		minNewPath = min(min(B));
+		A(ii,jj) = min(A(ii-1,jj),minNewPath);
+	end
+
+- Optimized version giving 10x speedup
+
+	Atmp = A(ii-1,:);
+	A(ii,:) = min([A(ii-1,:);(min(min(Atmp(ones(numCities,1),:,ones(numAircraft,1)) +
+		edgeCostSwap,[],2),[],3))']);
+
+- Result is totally illegible
+
+
+* Other issues
+- Parallel computing
+- Scaling to an ecosystem of packages: imports for a recent project
+
+.image gonumtour/stackmcimports.png _ 350
+
+* Go: A Great Language for Parallel Computing
+- Legibility is a must in science
+- Very fast
+- Tooling is great, especially around packages
+
+Operator overloading obscures code behavior
+
+	(x-mu)' * Sigma^-1 * (x-mu)
+
+- Hidden allocations
+- What are the types?
+- What does `'` do? Implicit? Copy? How to find out? Not easy to Google...
+
+Gonum sides with simplicity and consistency
+
+* "Productive, Performant, and Scalable"
+- Provide consistent APIs with design to interfaces
+- Allow memory reuse where reasonable (80/20 rule)
+- Many functions are concurrent-capable  ("opt-in" concurrency)
+
+	// Derivative estimates the derivative of the function f at the given location.
+	// The finite difference formula, the step size, and other options are
+	// specified by settings. If settings is nil, the first derivative will be
+	// estimated using the Forward formula and a default step size.
+	func Derivative(f func(float64) float64, x float64, settings *Settings) float64 {
+	...
+	}
+
+	// Settings is the settings structure for computing finite differences.
+	type Settings struct {
+		...
+		Concurrent bool // Should the function calls be executed concurrently.
+	}
+
+* Toward a Solution to the Two Language Problem
+- Pure Go - No mandatory C/Fortran
+- Translated 125+ LAPACK and BLAS functions
+- Competitive in speed (especially for full programs)
+
+* Gonum Design Philosophy
+
+* Panics vs. Errors
+- Rule #1: NO SILENT BUGS - Input is either clearly correct or it is wrong
+
+- Panic: Error is easy to check before call
+
+	// Add adds, element-wise, the elements of s and dst, and stores in dst.
+	// Panics if the lengths of dst and s do not match.
+	func Add(dst, s []float64) {
+		...
+	}
+
+- Error: Impossible to check without performing the operation
+
+	// Solve finds a minimum-norm solution to a system of linear equations defined
+	// by the matrices a and b. If A is singular or near-singular, a Condition error
+	// is returned.
+	func (m *Dense) Solve(a, b Matrix) error {
+		...
+	}
+
+* Memory Re-Use
+- If a function creates a type, allow a destination as a first argument
+- But allow a nil destination for ease
+
+	// Rand generates a random number according to the distributon.
+	// If the input slice is nil, new memory is allocated, otherwise the result is stored
+	// in place.
+	func (n *Normal) Rand(x []float64) []float64 {
+
+   
+	// CovarianceMatrix returns the covariance matrix calculated from a matrix of data, x.
+	//
+	// If cov is not nil it must either be zero-sized or have the same number of
+	// columns as the input data matrix. cov will be used as the destination for
+	// the covariance data. If cov is nil, a new mat.SymDense is allocated for
+	// the destination.
+	func CovarianceMatrix(cov *mat.SymDense, x mat.Matrix, weights []float64) *mat.SymDense {
+
+* "Functional" Programming
+- Functions and methods should not modify state, unless that is their only purpose
+- Even at the cost of extra allocations
+- Really important for easy concurrent programming
+
+* The Gonum Suite Functionality
+
+* Repositories
+`gonum.org/v1/gonum`: Main repository
+
+`github.com/gonum/plot`: Plotting library (will change to gonum.org import in the future)
+
+A few other repositories for `cgo` wrappers 
+
+- `gonum.org/v1/netlib`: LAPACK and BLAS wrappers (not mandatory)
+- `gonum.org/v1/hdf5`: For using the [[https://support.hdfgroup.org/HDF5/][hdf5]] file format
+
+* Package Overview
+
+- `floats`: Operations on `float64` and (pairs of) `[]float64` (Add, Norm, Distance)
+- `mat`: Matrix interface and types (Dense, SymDense) + Linear Algebra (Solve, QR)
+- `stat` (and subpackages): Stastics functions, probability distributions, sampling routines, spatial correlations
+- `graph`: Constructing, analyzing and manipulating (network) graphs
+- `optimize`: Finding the minima of functions
+- `diff`/`integrate`: Finding the numerical derivative/integral of functions
+
+* floats
+
+* floats (http://godoc.org/gonum.org/v1/gonum/floats)
+- Straightforward functionality
+
+.play gonumtour/floats.go
+
+* mat
+
+* mat (http://godoc.org/gonum.org/v1/gonum/mat)
+
+- Interfaces for matrix data (`mat.Matrix`)
+- Concrete types (`mat.Dense`)
+- Functions (`mat.Trace`)
+- "Factorization" types (`mat.Cholesky`)
+
+* Constructing Matrices
+- Specify size and optionally elements
+
+	func NewDense(r, c int, data []float64) *Dense
+
+- Example:
+
+.play gonumtour/mat_newdense.go /START OMIT/,/END OMIT/
+
+* Manipulating Matrices
+
+.play gonumtour/mat_atset.go /START OMIT/,/END OMIT/
+
+* Matrix operations
+- If the operation modifies a matrix, the modified matrix is the receiver
+- Package level functions are used when no matrix is modified
+- The receiver is allowed as input argument, other inputs unmodified
+
+.play gonumtour/mat_mul.go /START OMIT/,/END OMIT/
+
+* Example: Fit a Quadratic to Data
+
+.play gonumtour/mat_quadfit.go /START OMIT/,/END OMIT/
+
+* The Matrix Interface
+	type Matrix interface {
+		// Dims returns the dimensions of a Matrix.
+		Dims() (r, c int)
+		// At returns the value of a matrix element at row i, column j.
+		At(i, j int) float64
+		// T returns the transpose of the Matrix.
+		T() Matrix
+	}
+
+- `SymDense` for symmetric matrices
+- `TriDense` for triangular matrices
+- `BandDense` for banded matrices
+- `SymBandDense` for symmetric banded matrices
+
+	// Mul takes the matrix product of a and b, placing the result in the receiver.
+	// If the number of columns in a does not equal the number of rows in b, Mul will panic.
+	func (m *Dense) Mul(a, b Matrix) {
+		...
+	}
+
+* Matrix Types Example
+
+.play gonumtour/mat_multypes.go /START OMIT/,/END OMIT/
+
+* stat
+
+* stat (http://godoc.org/gonum.org/v1/gonum/stat)
+- Simple statistics of a `[]float64` (mean, median, standard deviation)
+- Distances between discrete probability distributions (Kullback-Leibler, Cross-Entropy)
+- Covariance Matrices, simple linear regression, and more
+
+Stats functions allow weighted data
+
+* stat example
+
+.play gonumtour/stat_basic.go /START OMIT/,/END OMIT/
+
+* stat/distuv, stat/distmv
+
+* stat/distuv and  stat/distmv
+
+- Probability distributions
+- `distuv`: univariate distributions (Normal, Gamma, Beta, etc.)
+- `distmv`: multivariate distributions (multivariate-Normal, Student's-T, Dirichlet)
+- Distributions can be supplied with a random number seed
+- Common method signatures
+	
+	type LogProber interface {
+		LogProb(float64) float64
+	}
+	type Rander interface {
+		Rand() float64
+	}
+ 
+	type LogProber interface {
+		LogProb([]float64) float64
+	}
+	type Rander interface {
+		Rand([]float64) []float64
+	}
+
+* distuv example
+
+.play gonumtour/distuv_mean.go /START OMIT/,/END OMIT/
+
+* distmv Example
+
+.play gonumtour/distmv_cov.go /START OMIT/,/END OMIT/
+
+* Wrap-Up
+
+* Packages
+- There is a *ton* we have not covered 
+- Please explore the packages and sub-packages
+- Have most of the functionality of numpy/scipy (no FFT, no ODE solver)
+- Have a lot they do not have
+
+* Contributions
+We would love contributors
+
+We didn't know each other at the start either
+
+Easy places to start
+
+- Code examples
+- More probability distributions in distuv and distmv
+
+[[https://github.com/gonum][github]]
+
+[[https://groups.google.com/forum/#!forum/gonum-dev][Development list]]
