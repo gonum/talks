@@ -4,7 +4,7 @@ An Introduction to Gonum
 Brendan Tracey
 
 * Talk Outline
-- Overview of Gonum 
+- Overview of Gonum
 - Gonum Philosophy
 - Brief examples of packages
 - Call for help
@@ -130,12 +130,12 @@ Gonum sides with simplicity and consistency
 - If a function creates a type, allow a destination as a first argument
 - But allow a nil destination for ease
 
-	// Rand generates a random number according to the distributon.
+	// Rand generates a random number according to the distribution.
 	// If the input slice is nil, new memory is allocated, otherwise the result is stored
 	// in place.
 	func (n *Normal) Rand(x []float64) []float64 {
 
-   
+
 	// CovarianceMatrix returns the covariance matrix calculated from a matrix of data, x.
 	//
 	// If cov is not nil it must either be zero-sized or have the same number of
@@ -156,7 +156,7 @@ Gonum sides with simplicity and consistency
 
 `github.com/gonum/plot`: Plotting library (will change to gonum.org import in the future)
 
-A few other repositories for `cgo` wrappers 
+A few other repositories for `cgo` wrappers
 
 - `gonum.org/v1/netlib`: LAPACK and BLAS wrappers (not mandatory)
 - `gonum.org/v1/hdf5`: For using the [[https://support.hdfgroup.org/HDF5/][hdf5]] file format
@@ -165,7 +165,7 @@ A few other repositories for `cgo` wrappers
 
 - `floats`: Operations on `float64` and (pairs of) `[]float64` (Add, Norm, Distance)
 - `mat`: Matrix interface and types (Dense, SymDense) + Linear Algebra (Solve, QR)
-- `stat` (and subpackages): Stastics functions, probability distributions, sampling routines, spatial correlations
+- `stat` (and subpackages): Statistics functions, probability distributions, sampling routines, spatial correlations
 - `graph`: Constructing, analyzing and manipulating (network) graphs
 - `optimize`: Finding the minima of functions
 - `diff`/`integrate`: Finding the numerical derivative/integral of functions
@@ -257,14 +257,14 @@ Stats functions allow weighted data
 - `distmv`: multivariate distributions (multivariate-Normal, Student's-T, Dirichlet)
 - Distributions can be supplied with a random number seed
 - Common method signatures
-	
+
 	type LogProber interface {
 		LogProb(float64) float64
 	}
 	type Rander interface {
 		Rand() float64
 	}
- 
+
 	type LogProber interface {
 		LogProb([]float64) float64
 	}
@@ -283,7 +283,7 @@ Stats functions allow weighted data
 * Wrap-Up
 
 * Packages
-- There is a *ton* we have not covered 
+- There is a *ton* we have not covered
 - Please explore the packages and sub-packages
 - Have most of the functionality of numpy/scipy (no FFT, no ODE solver)
 - Have a lot they do not have
