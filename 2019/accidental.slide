@@ -1,0 +1,214 @@
+Accidentally starting a community project in Go
+Gonum: Consistent, composable, and comprehensible scientific code
+
+Dan Kortschak
+Golang Adelaide
+
+
+* Go as a replacement for C
+
+* Original problem 2011
+
+Hired to revise a genomics analysis tool written in C (in the style of Fortran)
+
+- originally 32 bit code — not able to handle modern genome sequencing efforts
+- completely sequential — problem embarrassingly parallel
+
+Hit limits of revisibility due to design of the code
+
+*Rewrite!*
+
+
+* Explore alternatives
+
+My background is not software engineering
+
+- molecular biologist
+- evolutionary biologist
+- bioinformatician
+
+Needed something simple enough to pick up quickly, but adequately performant
+
+I had played with some Go the previous year (originally released in late 2009)
+
+The [[https://talks.golang.org/2012/splash.slide][design simplicity]] and nearish performance characteristics looked appealing
+
+
+* Programming problems in bioinformatics
+
+- limited training in writing maintainable software
+- short tenure of authors (1-4 years) — students
+- ... but long-lived projects
+
+Leads to pain — critical tools without support and often only just barely working
+
+
+* Go's design principles align with scientific computing needs
+
+"The language is based on design principles intended to promote rapid and efficient software development and reduce the barriers to entry for new developers — language features should be `simple', `orthogonal', `succinct' and `safe' (R. Pike, JAOO Conference 2010)."
+
+"These characteristics, the language implementation and its supporting tools are well aligned with the principles for scientific computing described by Wilson et al. (2014)"
+
+
+* Building a bioinformatics library
+
+The original problem required some basic bioinformatics routines be written
+
+.image https://imgs.xkcd.com/comics/standards.png
+.caption This was no doubt written for bioinformatics (xkcd.com/927)
+# http://creativecommons.org/licenses/by-nc/2.5/
+
+Quietly ... some months later, [[https://github.com/biogo/biogo][bíogo]] was finished
+
+This made the original problem trivial except...
+
+
+* Early Go limitations
+
+- `int` was 32 bit (so slice and array length limited to 2G elements)
+- runtime arena was 16GB
+- build system was not yet established — there were several competing tool chains
+- weeklies
+
+These were all fixed by Go1.1
+
+
+* bíogo eventually published-ish
+
+.image accidental/images/biogo-abstract.png
+
+
+* Using bíogo to explore bioinformatics problems
+
+The packages included some linear algebra (Cgo-based) and graph analysis routines
+
+Partly for exploration and partly for solving the original problem
+
+This attracted other users of Go from the science domain ... refugees from MATLAB, C++ and others ...
+
+Lead to a community effort to create a suite of packages for doing analyses using Go
+
+
+* go.science — G+ community
+
+Initial discussions were on G+
+
+.image accidental/images/go.science.png 500 _
+
+
+* Initial designs
+
+Focused around:
+
+- matrix arithmetic and linear algebra
+- simplifying `[]float64` handling
+- statistical functions
+- graph analysis
+
+Progressed to include numerical optimisation functions
+
+Attracted additional committed contributors to packages at [[https://github.com/gonum/][github.com/gonum]]
+
+
+* Small consistent contributing community
+
+.image accidental/images/contributors.png
+
+The people who contribute generally do so because it's fun
+
+
+* Largely influenced by the early golang-nuts culture
+
+I recall Russ Cox discussing bootstrapping of the culture in a talk
+
+# I couldn't find this in any videos, so I contacted Russ to ask if he remembered.
+# He didn't, but wrote the following, which matched my recollection perfectly.
+
+"I do think it was important to engage with everyone especially at the start, and then as other voices got up to speed and were able to handle most questions, we were able to step back."
+
+This helped build a strong early community of people wanting to build the things that were missing at the time
+
+
+* International efforts
+
+For the majority of the project the four main contributors lived on separate continents
+
+The first time meeting each other f2f or by video chat was this year
+
+- Didn't hamper development because of a strong common culture and Go's design
+
+
+* Gonum - core
+
+.iframe https://godoc.org/gonum.org/v1/gonum 550 950
+
+
+* Gonum - plotting
+
+
+.iframe https://godoc.org/gonum.org/v1/plot 550 950
+.caption Originally [[https://github.com/gonum/plot/wiki/Plotinum-redesign][Plotinum]] started by Ethan Burns
+
+
+* Gonum design principles
+
+* Consistency of API
+
+Doing the same kind of thing in different settings should look approximately the same
+(this is not R or perl)
+
+- Types usable composably between packages with little friction
+
+* No surprises
+
+Behaviour should be clearly documented and magic should not enter the picture
+(R, I am looking at you)
+
+- Testing is all just pure "testing" package
+
+- Close to zero use of `interface{}` in exported code
+
+
+* panics versus errors
+
+"*Don't*panic*" get's into the [[https://go-proverbs.github.io/][go-proverbs.io]] list from [[https://golang.org/doc/effective_go.html#panic][Effective Go]] but was not in the [[https://www.youtube.com/watch?v=PAAkCSZUG1c][talk]].
+
+Effective Go says:
+*But*what*if*the*error*is*unrecoverable?*
+*Sometimes*the*program*simply*cannot*continue.*
+
+Gonum follows the principle that incorrect software in a scientific setting should not continue running
+
+In the world of bioinformatics, incorrect results can lead to significant harm ([[https://www.nytimes.com/2011/07/08/health/research/08genes.html][erroneous drug trial approval for example]])
+
+Otherwise, idiomatic Go code
+
+
+* Notable Gonum package clients
+
+- [[https://github.com/gorgonia/gorgonia][Gorgonia]] — machine learning for Go
+- [[https://github.com/owulveryck/onnx-go][ONNX-Go]] — machine learning model exchange
+- [[https://github.com/usnistgov/dastard][NIST dastard]] — data acquisition
+- [[https://go-hep.org/][CERN Go-HEP]] — high energy particle physics analysis
+- [[https://github.com/influxdata/flux][InfluxData flux]] — data analysis scripting
+- [[https://github.com/kubernetes/kubernetes][Kubernetes internals]] — container orchestration
+- [[https://github.com/mongodb/amboy][MongoDB Amboy]] — job queuing
+
+We conducted a user survey recently — the majority of user responses indicated for-profit organisations (6x higher than academic users)
+
+
+* Documentations and tutorials
+
+From the survey...
+
+- users want more documentation
+- users want more tutorials
+
+These are going to happen — hopefully soonish, but external help is greatly appreciated
+
+
+* Gonum 1.0.0?
+
+What people have to say about Gonum: "If it could bother to do releases, it would be a shining example for other Go projects."
+
+I think, after about 6 years, we are now near a 1.0.0 release and API stability
